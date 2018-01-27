@@ -7,6 +7,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class CrawlTest {
 	WebDriver wDriver;
@@ -21,7 +23,7 @@ public class CrawlTest {
 	 */
 	public void toMainFrame() {
 		String framePath = "//iframe[@src='about:blank']";
-		this.waitUntilPageLoadedXPath(framePath);
+		this.waitUntilPageLoadedIFrame(framePath, "//ul[@id='m-pl-container']");
 		//wDriver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 		//System.out.println("url:"+wDriver.getCurrentUrl());
 		WebElement frameElement = wDriver.findElement(By.xpath(framePath));
@@ -54,7 +56,8 @@ public class CrawlTest {
 		try {
 			wDriver.findElement(By.xpath(v));
 		} catch (Exception ex) {
-			System.out.println(ex.toString());
+			//System.out.println(ex.toString());
+			System.out.println(this.wDriver.getPageSource());
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
@@ -65,13 +68,37 @@ public class CrawlTest {
 		}
 	}
 	
+	public void waitUntilPageLoadedIFrame(String v, String w) {
+		try {
+			WebElement frameElement = wDriver.findElement(By.xpath(v));
+			wDriver.switchTo().frame(frameElement);
+			this.wDriver.findElement(By.xpath(w));
+			
+		} catch (Exception ex) {
+			//System.out.println(ex.toString());
+			System.out.println(this.wDriver.getPageSource());
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			this.waitUntilPageLoadedIFrame(v, w);
+		} finally {
+			this.wDriver.switchTo().defaultContent();
+		}
+	}
+	
 	public void getInfo() {
 		String framePath = "//iframe[@src='about:blank']";
-		this.waitUntilPageLoadedXPath(framePath);
+		this.waitUntilPageLoadedIFrame(framePath, "//a[@data-res-action='fav']");
 		//wDriver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 		System.out.println("url:"+wDriver.getCurrentUrl());
 		WebElement frameElement = wDriver.findElement(By.xpath(framePath));
 		wDriver.switchTo().frame(frameElement);
+		//wDriver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		//System.out.println(this.wDriver.getPageSource());
+		//this.waitUntilPageLoadedXPath("//a[@data-res-action='fav']");
 		String favNum = wDriver.findElement(By.xpath("//a[@data-res-action='fav']")).getAttribute("data-count");
 		System.out.println("fav num: "+favNum);
 		String shareNum = wDriver.findElement(By.xpath("//a[@data-res-action='share']")).getAttribute("data-count");
@@ -96,7 +123,9 @@ public class CrawlTest {
         	List<WebElement> elementsTmp = ct1.wDriver.findElements(By.xpath("//a[@class='msk']"));
         	elementsTmp.get(i).click();
         	System.out.println(i+"th visit url:"+ct1.wDriver.getCurrentUrl());
+        	ct1.getInfo();
         	ct1.wDriver.navigate().back();
+        	ct1.wDriver.switchTo().defaultContent();
         }
 
         /**
