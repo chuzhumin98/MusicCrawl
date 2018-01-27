@@ -76,13 +76,15 @@ public class CrawlTest {
 			
 		} catch (Exception ex) {
 			//System.out.println(ex.toString());
-			System.out.println(this.wDriver.getPageSource());
+			System.out.println(this.wDriver.getCurrentUrl());
+			//System.out.println(this.wDriver.getPageSource());
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			this.wDriver.switchTo().defaultContent();
 			this.waitUntilPageLoadedIFrame(v, w);
 		} finally {
 			this.wDriver.switchTo().defaultContent();
@@ -125,7 +127,7 @@ public class CrawlTest {
         	System.out.println(i+"th visit url:"+ct1.wDriver.getCurrentUrl());
         	ct1.getInfo();
         	ct1.wDriver.navigate().back();
-        	ct1.wDriver.switchTo().defaultContent();
+        	System.out.println("has returned to the list");
         }
 
         /**
