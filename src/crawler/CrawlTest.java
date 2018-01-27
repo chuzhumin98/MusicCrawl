@@ -114,12 +114,24 @@ public class CrawlTest {
 		//wDriver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		//System.out.println(this.wDriver.getPageSource());
 		//this.waitUntilPageLoadedXPath("//a[@data-res-action='fav']");
+		String listTitle = this.wDriver.findElement(By.xpath("//h2[@class='f-ff2 f-brk']")).getText();
+		System.out.println("title:"+listTitle);
 		String favNum = wDriver.findElement(By.xpath("//a[@data-res-action='fav']")).getAttribute("data-count");
 		System.out.println("fav num: "+favNum);
 		String shareNum = wDriver.findElement(By.xpath("//a[@data-res-action='share']")).getAttribute("data-count");
 		System.out.println("share num: "+shareNum);
 		String commentNum = wDriver.findElement(By.xpath("//span[@id='cnt_comment_count']")).getText();
 		System.out.println("comment num: "+commentNum);
+		List<WebElement> tags = this.wDriver.findElements(By.xpath("//a[@class='u-tag']"));
+		String tagsString = "";
+		for (int i = 0; i < tags.size(); i++) {
+			WebElement item = tags.get(i);
+			tagsString += item.findElement(By.tagName("i")).getText();
+			if (i != tags.size() - 1) {
+				tagsString += " ";
+			}
+		}
+		System.out.println("tag name:"+tagsString);
 		wDriver.switchTo().defaultContent();
 	}
 	
@@ -148,7 +160,7 @@ public class CrawlTest {
         String url = "https://music.163.com/#/discover/playlist";
         ct1.wDriver.navigate().to(url);
         ct1.toMainFrame();
-        //ct1.crawlOnePage();
+        ct1.crawlOnePage();
         //移动到页面最底部  
         ((JavascriptExecutor)ct1.wDriver).executeScript("window.scrollTo(0, document.body.scrollHeight)"); 
         try {
