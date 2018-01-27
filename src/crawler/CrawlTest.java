@@ -24,7 +24,8 @@ public class CrawlTest {
 		System.setProperty("webdriver.chrome.driver","D:\\workspace\\MusicItem\\lib\\chromedriver.exe");//chromedriver服务地址
 		wDriver =new ChromeDriver(); //新建一个WebDriver 的对象，但是new 的是FirefoxDriver的驱动
 		try {
-			out = new PrintStream(new File(""));
+			out = new PrintStream(new File("output/songlist1.txt"));
+			out.println("id title time fav share comment song play tags");
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -149,10 +150,13 @@ public class CrawlTest {
 				WebElement item = tags.get(i);
 				tagsString += item.findElement(By.tagName("i")).getText();
 				if (i != tags.size() - 1) {
-					tagsString += " ";
+					tagsString += ",";
 				}
 			}
 			System.out.println("tag name:"+tagsString);
+			String infos = ids[1]+" "+listTitle+" "+timeSplits[0]+" "+favNum+" "
+						+shareNum+" "+commentNum+" "+songNum+" "+playNum+" "+tagsString;
+			out.println(infos);
 			//this.wDriver.findElement(By.xpath("//a[@id='album-desc-spread']")).click();
 			String desribeString;
 			try {
