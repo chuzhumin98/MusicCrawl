@@ -1,5 +1,8 @@
 package crawler;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -15,10 +18,17 @@ public class CrawlTest {
 	public WebDriver wDriver;
 	public int failTimes = 0; //当前失败的次数
 	public int nowStatus = 0; //当前的状态，0为列表界面，1为歌单界面
+	public PrintStream out;
 	
 	public CrawlTest() {
 		System.setProperty("webdriver.chrome.driver","D:\\workspace\\MusicItem\\lib\\chromedriver.exe");//chromedriver服务地址
 		wDriver =new ChromeDriver(); //新建一个WebDriver 的对象，但是new 的是FirefoxDriver的驱动
+		try {
+			out = new PrintStream(new File(""));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -109,20 +119,30 @@ public class CrawlTest {
 			String framePath = "//iframe[@src='about:blank']";
 			this.waitUntilPageLoadedIFrame(framePath, "//a[@data-res-action='fav']");
 			//wDriver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+			String url = this.wDriver.getCurrentUrl();
 			System.out.println("url:"+wDriver.getCurrentUrl());
 			WebElement frameElement = wDriver.findElement(By.xpath(framePath));
 			wDriver.switchTo().frame(frameElement);
 			//wDriver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 			//System.out.println(this.wDriver.getPageSource());
 			//this.waitUntilPageLoadedXPath("//a[@data-res-action='fav']");
+			String[] ids = url.split("=");
+			System.out.println("id:"+ids[1]);
 			String listTitle = this.wDriver.findElement(By.xpath("//h2[@class='f-ff2 f-brk']")).getText();
 			System.out.println("title:"+listTitle);
+			String timeString = this.wDriver.findElement(By.xpath("//span[@class='time s-fc4']")).getText();
+			String[] timeSplits = timeString.split(" ");
+			System.out.println("create time:"+timeSplits[0]);
 			String favNum = wDriver.findElement(By.xpath("//a[@data-res-action='fav']")).getAttribute("data-count");
 			System.out.println("fav num: "+favNum);
 			String shareNum = wDriver.findElement(By.xpath("//a[@data-res-action='share']")).getAttribute("data-count");
 			System.out.println("share num: "+shareNum);
 			String commentNum = wDriver.findElement(By.xpath("//span[@id='cnt_comment_count']")).getText();
 			System.out.println("comment num: "+commentNum);
+			String songNum = this.wDriver.findElement(By.xpath("//span[@id='playlist-track-count']")).getText();
+			System.out.println("songNum:"+songNum);
+			String playNum = this.wDriver.findElement(By.xpath("//strong[@id='play-count']")).getText();
+			System.out.println("playNum:"+playNum);
 			List<WebElement> tags = this.wDriver.findElements(By.xpath("//a[@class='u-tag']"));
 			String tagsString = "";
 			for (int i = 0; i < tags.size(); i++) {
@@ -154,17 +174,21 @@ public class CrawlTest {
         List<WebElement> elements = this.wDriver.findElements(By.xpath("//a[@class='msk']"));
         System.out.println("has "+elements.size()+" music item links in this page.");
         for (int i = 0; i < elements.size(); i++) {
-        	if (i != 0) {
-        		this.toMainFrame(); //避免重复操作
+        	try {
+        		if (i != 0) {
+            		this.toMainFrame(); //避免重复操作
+            	}
+            	List<WebElement> elementsTmp = this.wDriver.findElements(By.xpath("//a[@class='msk']"));
+            	elementsTmp.get(i).click();
+            	this.nowStatus = 1;
+            	System.out.println(i+"th visit url:"+this.wDriver.getCurrentUrl());
+            	this.getInfo();
+            	this.wDriver.navigate().back();
+            	this.nowStatus = 0;
+            	System.out.println("has returned to the list");
+        	} catch (Exception ex) {
+        		ex.printStackTrace();
         	}
-        	List<WebElement> elementsTmp = this.wDriver.findElements(By.xpath("//a[@class='msk']"));
-        	elementsTmp.get(i).click();
-        	this.nowStatus = 1;
-        	System.out.println(i+"th visit url:"+this.wDriver.getCurrentUrl());
-        	this.getInfo();
-        	this.wDriver.navigate().back();
-        	this.nowStatus = 0;
-        	System.out.println("has returned to the list");
         }
 	}
 	
@@ -174,11 +198,12 @@ public class CrawlTest {
         String url = "https://music.163.com/#/discover/playlist";
         ct1.wDriver.navigate().to(url);
         ct1.crawlOnePage();
+        /**
         ct1.toMainFrame();
         //移动到页面最底部  
         ((JavascriptExecutor)ct1.wDriver).executeScript("window.scrollTo(0, document.body.scrollHeight)"); 
         try {
-			Thread.sleep(5000);
+			Thread.sleep(3000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -186,6 +211,7 @@ public class CrawlTest {
         ct1.wDriver.findElement(By.xpath("//a[@class='zbtn znxt']")).click();
         ct1.nowStatus = 1;
         ct1.crawlOnePage();
+		*/
 
         /**
         url = "https://music.163.com/#/playlist?id=2032809330";
