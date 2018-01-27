@@ -1,5 +1,6 @@
 package crawler;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
@@ -13,6 +14,18 @@ public class CrawlTest {
 	public CrawlTest() {
 		System.setProperty("webdriver.chrome.driver","D:\\workspace\\MusicItem\\lib\\chromedriver.exe");//chromedriver服务地址
 		wDriver =new ChromeDriver(); //新建一个WebDriver 的对象，但是new 的是FirefoxDriver的驱动
+	}
+	
+	/**
+	 * 转移到main iframe之中
+	 */
+	public void toMainFrame() {
+		String framePath = "//iframe[@src='about:blank']";
+		this.waitUntilPageLoadedXPath(framePath);
+		//wDriver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+		//System.out.println("url:"+wDriver.getCurrentUrl());
+		WebElement frameElement = wDriver.findElement(By.xpath(framePath));
+		wDriver.switchTo().frame(frameElement);
 	}
 	
 	public void getInfo(String url) {
@@ -73,7 +86,19 @@ public class CrawlTest {
         long t1 = System.currentTimeMillis();
         String url = "https://music.163.com/#/discover/playlist";
         ct1.wDriver.navigate().to(url);
-        
+        ct1.toMainFrame();
+        List<WebElement> elements = ct1.wDriver.findElements(By.xpath("//a[@class='msk']"));
+        System.out.println("has "+elements.size()+" music item links in this page.");
+        for (int i = 0; i < elements.size(); i++) {
+        	if (i != 0) {
+        		ct1.toMainFrame(); //避免重复操作
+        	}
+        	List<WebElement> elementsTmp = ct1.wDriver.findElements(By.xpath("//a[@class='msk']"));
+        	elementsTmp.get(i).click();
+        	System.out.println(i+"th visit url:"+ct1.wDriver.getCurrentUrl());
+        	ct1.wDriver.navigate().back();
+        }
+
         /**
         url = "https://music.163.com/#/playlist?id=2032809330";
 		ct1.getInfo(url);
