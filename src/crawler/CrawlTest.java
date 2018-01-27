@@ -132,6 +132,15 @@ public class CrawlTest {
 			}
 		}
 		System.out.println("tag name:"+tagsString);
+		//this.wDriver.findElement(By.xpath("//a[@id='album-desc-spread']")).click();
+		String desribeString;
+		try {
+			desribeString = this.wDriver.findElement(By.xpath("//p[@id='album-desc-dot']")).getText();
+		} catch (Exception ex) {
+			System.out.println("haven't dot desc!");
+			desribeString = this.wDriver.findElement(By.xpath("//p[@id='album-desc-more']")).getText();
+		}
+		System.out.println("description:"+desribeString);
 		wDriver.switchTo().defaultContent();
 	}
 	
@@ -159,8 +168,8 @@ public class CrawlTest {
         long t1 = System.currentTimeMillis();
         String url = "https://music.163.com/#/discover/playlist";
         ct1.wDriver.navigate().to(url);
-        ct1.toMainFrame();
         ct1.crawlOnePage();
+        ct1.toMainFrame();
         //移动到页面最底部  
         ((JavascriptExecutor)ct1.wDriver).executeScript("window.scrollTo(0, document.body.scrollHeight)"); 
         try {
