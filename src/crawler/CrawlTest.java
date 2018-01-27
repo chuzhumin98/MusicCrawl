@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -146,8 +147,16 @@ public class CrawlTest {
         long t1 = System.currentTimeMillis();
         String url = "https://music.163.com/#/discover/playlist";
         ct1.wDriver.navigate().to(url);
-        //ct1.crawlOnePage();
         ct1.toMainFrame();
+        //ct1.crawlOnePage();
+        //移动到页面最底部  
+        ((JavascriptExecutor)ct1.wDriver).executeScript("window.scrollTo(0, document.body.scrollHeight)"); 
+        try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
         ct1.wDriver.findElement(By.xpath("//a[@class='zbtn znxt']")).click();
         ct1.nowStatus = 1;
         ct1.crawlOnePage();
