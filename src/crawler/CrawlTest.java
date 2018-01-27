@@ -105,43 +105,48 @@ public class CrawlTest {
 	}
 	
 	public void getInfo() {
-		String framePath = "//iframe[@src='about:blank']";
-		this.waitUntilPageLoadedIFrame(framePath, "//a[@data-res-action='fav']");
-		//wDriver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
-		System.out.println("url:"+wDriver.getCurrentUrl());
-		WebElement frameElement = wDriver.findElement(By.xpath(framePath));
-		wDriver.switchTo().frame(frameElement);
-		//wDriver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-		//System.out.println(this.wDriver.getPageSource());
-		//this.waitUntilPageLoadedXPath("//a[@data-res-action='fav']");
-		String listTitle = this.wDriver.findElement(By.xpath("//h2[@class='f-ff2 f-brk']")).getText();
-		System.out.println("title:"+listTitle);
-		String favNum = wDriver.findElement(By.xpath("//a[@data-res-action='fav']")).getAttribute("data-count");
-		System.out.println("fav num: "+favNum);
-		String shareNum = wDriver.findElement(By.xpath("//a[@data-res-action='share']")).getAttribute("data-count");
-		System.out.println("share num: "+shareNum);
-		String commentNum = wDriver.findElement(By.xpath("//span[@id='cnt_comment_count']")).getText();
-		System.out.println("comment num: "+commentNum);
-		List<WebElement> tags = this.wDriver.findElements(By.xpath("//a[@class='u-tag']"));
-		String tagsString = "";
-		for (int i = 0; i < tags.size(); i++) {
-			WebElement item = tags.get(i);
-			tagsString += item.findElement(By.tagName("i")).getText();
-			if (i != tags.size() - 1) {
-				tagsString += " ";
-			}
-		}
-		System.out.println("tag name:"+tagsString);
-		//this.wDriver.findElement(By.xpath("//a[@id='album-desc-spread']")).click();
-		String desribeString;
 		try {
-			desribeString = this.wDriver.findElement(By.xpath("//p[@id='album-desc-dot']")).getText();
-		} catch (Exception ex) {
-			System.out.println("haven't dot desc!");
-			desribeString = this.wDriver.findElement(By.xpath("//p[@id='album-desc-more']")).getText();
+			String framePath = "//iframe[@src='about:blank']";
+			this.waitUntilPageLoadedIFrame(framePath, "//a[@data-res-action='fav']");
+			//wDriver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+			System.out.println("url:"+wDriver.getCurrentUrl());
+			WebElement frameElement = wDriver.findElement(By.xpath(framePath));
+			wDriver.switchTo().frame(frameElement);
+			//wDriver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+			//System.out.println(this.wDriver.getPageSource());
+			//this.waitUntilPageLoadedXPath("//a[@data-res-action='fav']");
+			String listTitle = this.wDriver.findElement(By.xpath("//h2[@class='f-ff2 f-brk']")).getText();
+			System.out.println("title:"+listTitle);
+			String favNum = wDriver.findElement(By.xpath("//a[@data-res-action='fav']")).getAttribute("data-count");
+			System.out.println("fav num: "+favNum);
+			String shareNum = wDriver.findElement(By.xpath("//a[@data-res-action='share']")).getAttribute("data-count");
+			System.out.println("share num: "+shareNum);
+			String commentNum = wDriver.findElement(By.xpath("//span[@id='cnt_comment_count']")).getText();
+			System.out.println("comment num: "+commentNum);
+			List<WebElement> tags = this.wDriver.findElements(By.xpath("//a[@class='u-tag']"));
+			String tagsString = "";
+			for (int i = 0; i < tags.size(); i++) {
+				WebElement item = tags.get(i);
+				tagsString += item.findElement(By.tagName("i")).getText();
+				if (i != tags.size() - 1) {
+					tagsString += " ";
+				}
+			}
+			System.out.println("tag name:"+tagsString);
+			//this.wDriver.findElement(By.xpath("//a[@id='album-desc-spread']")).click();
+			String desribeString;
+			try {
+				desribeString = this.wDriver.findElement(By.xpath("//p[@id='album-desc-dot']")).getText();
+			} catch (Exception ex) {
+				System.out.println("haven't dot desc!");
+				desribeString = this.wDriver.findElement(By.xpath("//p[@id='album-desc-more']")).getText();
+			}
+			System.out.println("description:"+desribeString);
+			wDriver.switchTo().defaultContent();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		System.out.println("description:"+desribeString);
-		wDriver.switchTo().defaultContent();
+		
 	}
 	
 	public void crawlOnePage() {
