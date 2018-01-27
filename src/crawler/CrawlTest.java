@@ -11,7 +11,9 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class CrawlTest {
-	WebDriver wDriver;
+	public WebDriver wDriver;
+	public int failTimes = 0; //当前失败的次数
+	public int nowStatus = 0; //当前的状态，0为列表界面，1为歌单界面
 	
 	public CrawlTest() {
 		System.setProperty("webdriver.chrome.driver","D:\\workspace\\MusicItem\\lib\\chromedriver.exe");//chromedriver服务地址
@@ -73,7 +75,7 @@ public class CrawlTest {
 			WebElement frameElement = wDriver.findElement(By.xpath(v));
 			wDriver.switchTo().frame(frameElement);
 			this.wDriver.findElement(By.xpath(w));
-			
+			this.failTimes = 0;
 		} catch (Exception ex) {
 			//System.out.println(ex.toString());
 			System.out.println(this.wDriver.getCurrentUrl());
@@ -85,6 +87,16 @@ public class CrawlTest {
 				e.printStackTrace();
 			}
 			this.wDriver.switchTo().defaultContent();
+			this.failTimes++;
+			if (failTimes >= 5) {
+				if (this.nowStatus == 0) {
+					this.wDriver.navigate().forward();
+					this.wDriver.navigate().back();
+				} else if (this.nowStatus == 1) {
+					this.wDriver.navigate().back();
+					this.wDriver.navigate().forward();
+				}
+			}
 			this.waitUntilPageLoadedIFrame(v, w);
 		} finally {
 			this.wDriver.switchTo().defaultContent();
@@ -110,25 +122,35 @@ public class CrawlTest {
 		wDriver.switchTo().defaultContent();
 	}
 	
+	public void crawlOnePage() {
+        this.toMainFrame();
+        List<WebElement> elements = this.wDriver.findElements(By.xpath("//a[@class='msk']"));
+        System.out.println("has "+elements.size()+" music item links in this page.");
+        for (int i = 0; i < elements.size(); i++) {
+        	if (i != 0) {
+        		this.toMainFrame(); //避免重复操作
+        	}
+        	List<WebElement> elementsTmp = this.wDriver.findElements(By.xpath("//a[@class='msk']"));
+        	elementsTmp.get(i).click();
+        	this.nowStatus = 1;
+        	System.out.println(i+"th visit url:"+this.wDriver.getCurrentUrl());
+        	this.getInfo();
+        	this.wDriver.navigate().back();
+        	this.nowStatus = 0;
+        	System.out.println("has returned to the list");
+        }
+	}
+	
 	public static void main(String[] args) {
 		CrawlTest ct1 = new CrawlTest();
         long t1 = System.currentTimeMillis();
         String url = "https://music.163.com/#/discover/playlist";
         ct1.wDriver.navigate().to(url);
+        //ct1.crawlOnePage();
         ct1.toMainFrame();
-        List<WebElement> elements = ct1.wDriver.findElements(By.xpath("//a[@class='msk']"));
-        System.out.println("has "+elements.size()+" music item links in this page.");
-        for (int i = 0; i < elements.size(); i++) {
-        	if (i != 0) {
-        		ct1.toMainFrame(); //避免重复操作
-        	}
-        	List<WebElement> elementsTmp = ct1.wDriver.findElements(By.xpath("//a[@class='msk']"));
-        	elementsTmp.get(i).click();
-        	System.out.println(i+"th visit url:"+ct1.wDriver.getCurrentUrl());
-        	ct1.getInfo();
-        	ct1.wDriver.navigate().back();
-        	System.out.println("has returned to the list");
-        }
+        ct1.wDriver.findElement(By.xpath("//a[@class='zbtn znxt']")).click();
+        ct1.nowStatus = 1;
+        ct1.crawlOnePage();
 
         /**
         url = "https://music.163.com/#/playlist?id=2032809330";
