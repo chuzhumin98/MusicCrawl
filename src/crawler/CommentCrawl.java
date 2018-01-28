@@ -114,12 +114,13 @@ public class CommentCrawl {
         String url = "https://music.163.com/#/playlist?id=37432514";
         cc1.wDriver.navigate().to(url);
         //cc1.toMainFrame("//div[@class='cmmts j-flag']");
-        cc1.getInfo();
-        boolean succeedChangePage = cc1.changePage();
-        if (succeedChangePage) {
+        while (true) {
         	cc1.getInfo();
-        }
-        
+        	boolean succeedChangePage = cc1.changePage();
+        	if (!succeedChangePage) {
+            	break;
+            }
+        }      
 		long t2 = System.currentTimeMillis();
 		System.out.println("cost time:"+(t2-t1)+"ms");
 	}
