@@ -21,7 +21,7 @@ public class CommentCrawl {
 		wDriver =new ChromeDriver(); //新建一个WebDriver 的对象，但是new 的是FirefoxDriver的驱动
 		try {
 			out = new PrintStream(new File("output/songcommentlist1.txt"));
-			out.println("id title time fav share comment song play tags");
+			//out.println("id title time fav share comment song play tags");
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -75,6 +75,7 @@ public class CommentCrawl {
 			String[] commentSplit = commentTotal.split("：", 2);
 			String comment1 = commentSplit[Math.min(2, commentSplit.length)-1];
 			System.out.println(comment1);
+			out.println(comment1);
 		}
 		
 	}
@@ -88,7 +89,7 @@ public class CommentCrawl {
 	    //先移动到页面最底部  
         ((JavascriptExecutor)this.wDriver).executeScript("window.scrollTo(0, document.body.scrollHeight)"); 
         try {
-			Thread.sleep(3000);
+			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
