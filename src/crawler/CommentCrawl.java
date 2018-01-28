@@ -6,6 +6,7 @@ import java.io.PrintStream;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -78,12 +79,46 @@ public class CommentCrawl {
 		
 	}
 	
+	/**
+	 * 完成换页操作，失败则返回false
+	 * 
+	 * @return
+	 */
+	public boolean changePage() {
+	    //先移动到页面最底部  
+        ((JavascriptExecutor)this.wDriver).executeScript("window.scrollTo(0, document.body.scrollHeight)"); 
+        try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		WebElement commentPage1 = this.wDriver.findElement(By.xpath("//div[@class='m-cmmt']"));
+		List<WebElement> tmp1 = commentPage1.findElements(By.tagName("div"));
+		WebElement commentPage2 = tmp1.get(tmp1.size()-1);
+		tmp1 = commentPage2.findElements(By.tagName("a"));
+		WebElement commentPage3 = tmp1.get(tmp1.size() - 1);
+		//查看是否包含下一页，没有的话就返回false
+		if (commentPage3.getText().equals("下一页") && !commentPage3.getAttribute("class").contains("js-disabled")) {
+			commentPage3.click();
+			return true;
+		} else {
+			return false;
+		}
+		
+	}
+	
 	public static void main(String[] args) {
 		CommentCrawl cc1 = new CommentCrawl();
 		long t1 = System.currentTimeMillis();
         String url = "https://music.163.com/#/playlist?id=37432514";
         cc1.wDriver.navigate().to(url);
+        //cc1.toMainFrame("//div[@class='cmmts j-flag']");
         cc1.getInfo();
+        boolean succeedChangePage = cc1.changePage();
+        if (succeedChangePage) {
+        	cc1.getInfo();
+        }
         
 		long t2 = System.currentTimeMillis();
 		System.out.println("cost time:"+(t2-t1)+"ms");
