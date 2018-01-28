@@ -76,6 +76,7 @@ public class CommentCrawl {
 			String comment1 = commentSplit[Math.min(2, commentSplit.length)-1];
 			System.out.println(comment1);
 			out.println(comment1);
+			out.println();
 		}
 		
 	}
